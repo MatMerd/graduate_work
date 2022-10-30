@@ -1,0 +1,7 @@
+@startuml
+"Client A (admin)"
+"Client B"
+"Client C"
+
+
+@enduml

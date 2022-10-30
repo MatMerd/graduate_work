@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  redis:
+    env_file:
+      - .env
+    image: bitnami/redis:latest # поддерживает env REDIS_PASSWORD
+    # depends_on:
+    #   app:
+    #     condition: service_healthy
+    #   app-web:
+    #     condition: service_started
+    healthcheck:
+      test: redis-cli -a $REDIS_PASSWORD ping || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    ports:
+      - 6379:6379

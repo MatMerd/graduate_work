@@ -1,0 +1,10 @@
+{
+    "middleware": {
+        "allow_origins": ["Fill it out"],
+        "allow_headers": ["Fill it out"]
+    },
+    "logger": {
+
+    },
+    "not use field": "Save this file afer custom it as settings.json"
+}
