@@ -1,4 +1,3 @@
-from copy import deepcopy
 from functools import lru_cache
 
 import orjson
@@ -6,11 +5,11 @@ from aioredis import Redis
 from fastapi import Depends
 
 
-from core.exceptions import CinemaRoomNotFoundError, UserAlreadyExistError
+from core.exceptions import CinemaRoomNotFoundError
 from core.utils import construct_cinema_room_chanel_messages_by_room_id
 from .base_service import AbstractService
 from db.redis import get_redis_client
-from schemas.cinema_room import CinemaRoom, CinemaRoomCreate, CinemaRoomUpdate, User
+from schemas.cinema_room import CinemaRoom, CinemaRoomCreate, CinemaRoomUpdate
 
 
 class CinemaService(AbstractService):
@@ -23,7 +22,7 @@ class CinemaService(AbstractService):
     async def create_cinema_room(
         self, cinema_key: str, admin_id: str, cinema_room_data: CinemaRoomCreate
     ) -> CinemaRoom:
-        return await super().create_cinema_room(cinema_key, admin_id, cinema_room_data)
+        return await super().create_cinema_room(cinema_key, admin_id,cinema_room_data=cinema_room_data)
 
     async def update_cinema_room(
         self, cinema_room: CinemaRoom, update_room_data: CinemaRoomUpdate
@@ -32,21 +31,6 @@ class CinemaService(AbstractService):
 
     async def delete_cinema_room(self, cinema_key: str) -> bool:
         return await super().delete_cinema_room(cinema_key=cinema_key)
-
-    def check_cinema_room_users(
-        self, cinema_room: CinemaRoom, user: User
-    ) -> list[User]:
-        users = deepcopy(cinema_room.users)
-        if not users:
-            users = [user]
-        else:
-            if user.user_id not in [u.user_id for u in users]:
-                users.append(user)
-            else:
-                raise UserAlreadyExistError(
-                    message=f"User already exist in cinema room {cinema_room.cinema_room_key}"
-                )
-        return users
 
     async def _get(self, cinema_key: str) -> CinemaRoom:
         cinema_room_data = await self.redis.get(cinema_key)

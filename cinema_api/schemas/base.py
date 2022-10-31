@@ -2,4 +2,6 @@ from pydantic import BaseModel
 
 
 class BaseSchema(BaseModel):
-    pass
+
+    class Config:
+        arbitrary_types_allowed = True

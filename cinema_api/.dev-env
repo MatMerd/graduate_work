@@ -1,3 +1,4 @@
 # python env
 PYTHONDONTWRITEBYTECODE=1
 REDIS_URL='redis://default:sEcRet@127.0.0.1:6379/1'
+AUTH_SERVICE_URL="http://auth-service"

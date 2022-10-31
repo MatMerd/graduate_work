@@ -5,11 +5,6 @@ services:
     env_file:
       - .env
     image: bitnami/redis:latest # поддерживает env REDIS_PASSWORD
-    # depends_on:
-    #   app:
-    #     condition: service_healthy
-    #   app-web:
-    #     condition: service_started
     healthcheck:
       test: redis-cli -a $REDIS_PASSWORD ping || exit 1
       interval: 10s
@@ -18,3 +13,16 @@ services:
       start_period: 5s
     ports:
       - 6379:6379
+  
+  wiremock:
+    image: wiremock/wiremock:latest
+    volumes:
+      - $PWD/wiremock/extensions:/var/wiremock/extensions
+      - $PWD/wiremock/mappings:/home/wiremock/mappings
+      - $PWD/wiremock/__files:/home/wiremock/__files
+    command:
+      - "--max-request-journal-entries=1000"
+      - "--container-threads=120"
+      - "--extensions=com.github.masonm.JwtMatcherExtension,com.github.masonm.JwtStubMappingTransformer"
+    ports:
+      - 8080:8080

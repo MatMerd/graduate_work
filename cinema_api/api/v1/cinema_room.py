@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import ORJSONResponse
 
+from crud.auth_crud import get_current_user
 from crud.cinema_crud import CinemaCRUD, get_cinema_crud
-from schemas.cinema_room import CinemaRoom, CinemaRoomCreate
-from api import deps
+from schemas.cinema_room import CinemaRoom, CinemaRoomCreate, User
+
 
 router = APIRouter()
 
@@ -31,10 +32,11 @@ async def create_cinema_room(
     *,
     cinema_crud: CinemaCRUD = Depends(get_cinema_crud),
     cinema_room_create: CinemaRoomCreate,
-    current_user_id: str = Depends(deps.get_current_user_id),
+    current_user: User = Depends(get_current_user),
 ) -> CinemaRoom:
     cinema_room = await cinema_crud.create_cinema_room(
-        cinema_room_create=cinema_room_create, admin_id=current_user_id
+        admin_id=current_user.user_id,
+        cinema_room_create=cinema_room_create
     )
     return cinema_room
 

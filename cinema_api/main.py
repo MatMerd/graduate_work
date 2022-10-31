@@ -27,6 +27,8 @@ def setup_app(env_type: AppEnvTypes | None = None):
     else:
         api_settings = config.get_app_settings()
 
+    config.settings = api_settings
+
     log.main_logger = api_settings.setup_logger("main_logger")
     setup_app_middleware(api_settings.middleware)
     setup_routers(api_prefix=api_settings.api_prefix)

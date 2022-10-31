@@ -14,6 +14,7 @@ python-dotenv = "^0.20.0"
 aioredis = "^2.0.1"
 loguru = "^0.6.0"
 gunicorn = "^20.1.0"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 
 [tool.poetry.dev-dependencies]
 flake8 = "^5.0.4"

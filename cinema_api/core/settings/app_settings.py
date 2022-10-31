@@ -42,7 +42,8 @@ class AppSettings(BaseAppSettings):
 
     api_prefix: str = "/api/v1"
 
-    jwt_token_prefix: str = "Token"
+    jwt_token_prefix: str = "Bearer"
+    auth_service_url: str
 
     middleware: dict[str, Any]
     logger: dict[str, Any]
