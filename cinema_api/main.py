@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 import uvicorn
 
@@ -7,7 +8,11 @@ from fastapi.responses import ORJSONResponse
 from starlette.middleware.cors import CORSMiddleware
 
 from api.v1 import cinema_room, cinema_room_ws
-from core.exceptions import CinemaRoomNotFoundError
+from core.exceptions import (
+    CinemaRoomNotFoundError,
+    UserNotAuthentificated,
+    UserPermissionError,
+)
 from db import redis
 import core.log as log
 from core import config
@@ -53,6 +58,14 @@ def setup_app(env_type: AppEnvTypes | None = None):
     ):
         return ORJSONResponse(status_code=exc.status_code, content=exc.json_error())
 
+    @app.exception_handler(UserNotAuthentificated)
+    async def user_not_auth(request: Request, exc: CinemaRoomNotFoundError):
+        return ORJSONResponse(status_code=exc.status_code, content=exc.json_error())
+
+    @app.exception_handler(UserPermissionError)
+    async def user_not_have_permission(request: Request, exc: CinemaRoomNotFoundError):
+        return ORJSONResponse(status_code=exc.status_code, content=exc.json_error())
+
 
 def setup_app_middleware(middleware_settings: dict[str, Any]):
     log.main_logger.info("Setup middlewares")
@@ -68,9 +81,6 @@ def setup_routers(api_prefix: str):
 
 if __name__ == "__main__":
     setup_app()
-    uvicorn.run(
-        "main:app",
-        reload=True,
-    )
+    uvicorn.run("main:app", reload=True)
 else:
     setup_app()

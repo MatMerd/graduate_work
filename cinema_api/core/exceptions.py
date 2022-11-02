@@ -39,3 +39,11 @@ class CinemaRoomNotFoundError(BaseCustomException):
 
 class UserAlreadyExistError(BaseCustomException):
     status_code: int = 404
+
+
+class UserNotAuthentificated(BaseCustomException):
+    status_code: int = 403
+
+
+class UserPermissionError(BaseCustomException):
+    status_code: int = 403

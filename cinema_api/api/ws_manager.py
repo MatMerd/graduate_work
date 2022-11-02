@@ -1,14 +1,15 @@
-from fastapi import Depends, WebSocket, WebSocketDisconnect
+from functools import lru_cache
+from typing import Any
 
+import orjson
+from fastapi import Depends, WebSocket
 
 from crud.cinema_crud import CinemaCRUD, get_cinema_crud
-from db.redis import get_redis_client
 from core import log
-from core.utils import (
-    construct_cinema_room_chanel_messages_by_chanel_name,
-    construct_cinema_room_chanel_name,
-)
-from schemas.cinema_room import CinemaRoom, User
+from core.utils import construct_cinema_room_chanel_messages_by_room_id
+from schemas.cinema_room import User
+from service.message_service import get_message_service, MessageService
+from schemas.websocket_command import Command
 
 
 # TODO: придумать, как это можно использовать
@@ -69,29 +70,56 @@ from schemas.cinema_room import CinemaRoom, User
 
 
 class WebsocketManager:
-    def __init__(self, cinema_room_id: str, user: User, cinema_crud: CinemaCRUD):
+    def __init__(
+        self,
+        cinema_room_id: str,
+        cinema_crud: CinemaCRUD,
+        message_service: MessageService,
+    ):
         self.cinema_crud = cinema_crud
         self.cinema_room_id = cinema_room_id
-        self.user = user
+        self.users: dict[WebSocket, User] = dict()
+        self.cinema_room_chanel = construct_cinema_room_chanel_messages_by_room_id(
+            cinema_room_id
+        )
+        self.message_service = message_service
 
-        self.cinema_room: CinemaRoom
-
-    async def connect(self, websocket: WebSocket):
+    async def connect(self, websocket: WebSocket, user: User):
         await websocket.accept()
-        self.cinema_room = await self.cinema_crud.get_cinema_room(cinema_room_key=self.cinema_room_id)
-        self.user.websocket = websocket
-        await self.cinema_crud.add_user_to_users_list(cinema_room=self.cinema_room, user=self.user)
+        self.cinema_room = await self.cinema_crud.get_cinema_room(
+            cinema_room_key=self.cinema_room_id
+        )
+        self.users[websocket] = user
+        self.cinema_room = await self.cinema_crud.add_user_to_users_list(
+            cinema_room=self.cinema_room, user=user
+        )
+        messages = await self.message_service.get_messages_from_room(
+            self.cinema_room_chanel
+        )
+        for message in messages:
+            await self.send_personal_message(message, websocket)
+        log.main_logger.info(f"User connected to room: {user.username}")
 
-    async def disconnect(self):
-        await self.cinema_crud.remove_user_from_user_list(cinema_room=self.cinema_room, user=self.user)
+    async def disconnect(self, websocket, user):
+        del self.users[websocket]
+        self.cinema_room = await self.cinema_crud.remove_user_from_user_list(
+            cinema_room=self.cinema_room, user=user
+        )
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
+    async def send_personal_message(self, command: Command, websocket: WebSocket):
+        jsonable_command = orjson.loads(command.json())
+        await websocket.send_json(jsonable_command)
 
-    async def broadcast(self, message: str):
-        for connection in [user.websocket for user in self.cinema_room.users if user.websocket]:
-            await connection.send_text(message)
+    async def broadcast(self, command: dict[str, Any]):
+        Command(**command)
+        for connection in self.users:
+            await connection.send_json(command)
 
 
-def get_websocket_manager(cinema_room_id: str, user: User, cinema_crud=Depends(get_cinema_crud)):
-    return WebsocketManager(cinema_room_id, user, cinema_crud)
+@lru_cache
+def get_websocket_manager(
+    cinema_room_id: str,
+    cinema_crud=Depends(get_cinema_crud),
+    message_service=Depends(get_message_service),
+):
+    return WebsocketManager(cinema_room_id, cinema_crud, message_service)

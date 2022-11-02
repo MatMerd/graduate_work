@@ -43,7 +43,7 @@ class AppSettings(BaseAppSettings):
     api_prefix: str = "/api/v1"
 
     jwt_token_prefix: str = "Bearer"
-    auth_service_url: str
+    auth_service_url: str = "http://127.0.0.1:8080"
 
     middleware: dict[str, Any]
     logger: dict[str, Any]
@@ -87,5 +87,6 @@ class AppSettings(BaseAppSettings):
         for logger_name in self.loggers_type:
             logging_logger = logging.getLogger(logger_name)
             logging_logger.handlers = [log.InterceptHandler(level=self.log_level)]
-        log.logger.add(**self.logger, level=self.log_level, filter=log.filter_by_name, rotation="100 MB", retention="10 days")  # type: ignore
+        log.logger.remove()
+        log.logger.add(**self.logger, filter=log.filter_by_name(bind_name), rotation="10 MB", retention="10 days")  # type: ignore
         return log.logger.bind(name=bind_name)

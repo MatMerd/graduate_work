@@ -13,11 +13,12 @@ class CinemaRoomUserTypeEnum(str, Enum):
     viewer = "viewer"
 
 
-class User(BaseSchema):
+class UserBase(BaseSchema):
     user_id: str
     username: str
-    websocket: Optional[WebSocket] = None
-    cinema_room_user_type: Optional[CinemaRoomUserTypeEnum] = CinemaRoomUserTypeEnum.viewer
+    cinema_room_user_type: Optional[
+        CinemaRoomUserTypeEnum
+    ] = CinemaRoomUserTypeEnum.viewer
 
     @validator("user_id")
     def is_valid_user_ids(cls, v):
@@ -29,9 +30,14 @@ class User(BaseSchema):
         return v
 
 
+class User(UserBase):
+    # websocket: Optional[WebSocket] = None
+    pass
+
+
 class CinemaRoomBase(BaseSchema):
     film_view_timestamp: Optional[float] = 0
-    users: Optional[list[User]] = None
+    users: Optional[dict[str, User]] = None
     film_id: Optional[str] = None
 
     @validator("film_id")
@@ -53,7 +59,7 @@ class CinemaRoomWithAdmin(CinemaRoomBase):
 
 class CinemaRoomCreate(CinemaRoomBase):
     film_id: str
-    users: Optional[list[User]] = []
+    users: Optional[dict[str, User]] = {}
 
 
 class CinemaRoomUpdate(CinemaRoomBase):
@@ -62,10 +68,14 @@ class CinemaRoomUpdate(CinemaRoomBase):
 
 class CinemaRoom(CinemaRoomWithAdmin):
     cinema_room_key: str
-    users: list[User]
+    users: dict[str, User]
 
     @validator("cinema_room_key")
     def is_valid_cinema_room_key(cls, v):
         if not is_valid_uuid(v):
             raise ValueError("cinema room key must be uuid value")
         return str(v)
+
+
+class CinemaRoomResponse(CinemaRoom):
+    users: dict[str, UserBase]

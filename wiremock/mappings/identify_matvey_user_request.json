@@ -1,0 +1,29 @@
+{
+    "request" : {
+        "url" : "/users/identify-user",
+        "method" : "GET",
+        "customMatcher" : {
+            "name" : "jwt-matcher",
+            "parameters" : {
+                "header" : {
+                    "alg" : "HS256",
+                    "typ": "JWT"
+                },
+                "payload": {
+                    "login" : "matveyS",
+                    "user_id" : "c2e9e93f-06c6-4ee9-b321-6a730a52fb18"
+                }
+            }
+        }
+    },
+    "response" : {
+        "status" : 200,
+        "jsonBody": {
+            "login" : "matveyS",
+            "user_id" : "c2e9e93f-06c6-4ee9-b321-6a730a52fb18"
+        },
+        "headers" : {
+            "Content-Type" : "application/json; charset=UTF-8"
+        }
+    }
+}

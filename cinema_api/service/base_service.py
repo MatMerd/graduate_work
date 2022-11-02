@@ -23,8 +23,8 @@ class AbstractService(ABC, Generic[SchemaType]):
             cinema_room=cinema_room, update_room_data=update_room_data
         )
 
-    async def delete_cinema_room(self, cinema_key: str) -> bool:
-        return await self._delete(cinema_key=cinema_key)
+    async def delete_cinema_room(self, cinema_key: str, admin_id: str) -> bool:
+        return await self._delete(cinema_key=cinema_key, admin_id=admin_id)
 
     @abstractmethod
     async def _get(self, cinema_key: str) -> SchemaType:
@@ -43,5 +43,5 @@ class AbstractService(ABC, Generic[SchemaType]):
         raise NotImplementedError
 
     @abstractmethod
-    async def _delete(self, cinema_key: str) -> bool:
+    async def _delete(self, cinema_key: str, admin_id: str) -> bool:
         raise NotImplementedError

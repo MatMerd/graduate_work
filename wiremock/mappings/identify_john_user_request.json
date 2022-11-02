@@ -1,0 +1,29 @@
+{
+    "request" : {
+        "url" : "/users/identify-user",
+        "method" : "GET",
+        "customMatcher" : {
+            "name" : "jwt-matcher",
+            "parameters" : {
+                "header" : {
+                    "alg" : "HS256",
+                    "typ": "JWT"
+                },
+                "payload": {
+                    "login" : "johnd4",
+                    "user_id" : "ad9d7b83-6601-406d-90bf-8bd5483cd1a8"
+                }
+            }
+        }
+    },
+    "response" : {
+        "status" : 200,
+        "jsonBody": {
+            "login" : "johnd4",
+            "user_id" : "ad9d7b83-6601-406d-90bf-8bd5483cd1a8"
+        },
+        "headers" : {
+            "Content-Type" : "application/json; charset=UTF-8"
+        }
+    }
+}
