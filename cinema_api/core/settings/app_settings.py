@@ -37,6 +37,8 @@ class AppSettings(BaseAppSettings):
     version: str = "0.1.0"
 
     redis_url: RedisDsn
+    celery_broker_url: RedisDsn
+    celery_result_backend: RedisDsn
 
     secret_key: SecretStr = SecretStr("secret")
 

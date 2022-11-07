@@ -7,12 +7,21 @@ services:
     image: bitnami/redis:latest # поддерживает env REDIS_PASSWORD
     healthcheck:
       test: redis-cli -a $REDIS_PASSWORD ping || exit 1
-      interval: 10s
+      interval: 30s
       timeout: 5s
       retries: 5
       start_period: 5s
     ports:
       - 6379:6379
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 8000:3000
+    restart: always
   
   wiremock:
     image: wiremock/wiremock:latest

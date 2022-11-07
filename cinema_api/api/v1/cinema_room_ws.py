@@ -34,4 +34,5 @@ async def cinema_room_ws_messages(
                 log.main_logger.info(f"User {user.username} disconnected")
                 await ws_manager.disconnect(websocket, user)
     except RuntimeError:
-        log.main_logger.info("WebSocket client closed")
+        log.main_logger.info(f"Users count: {len(ws_manager.users)}")
+        log.main_logger.info(f"WebSocket client for {user.username} closed")

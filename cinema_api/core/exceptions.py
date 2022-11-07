@@ -45,5 +45,9 @@ class UserNotAuthentificated(BaseCustomException):
     status_code: int = 403
 
 
+class UserNotFoundError(BaseCustomException):
+    status_code: int = 404
+
+
 class UserPermissionError(BaseCustomException):
     status_code: int = 403

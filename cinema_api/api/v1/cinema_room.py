@@ -3,7 +3,7 @@ from fastapi.responses import ORJSONResponse
 
 from crud.auth_crud import get_current_user_http
 from crud.cinema_crud import CinemaCRUD, get_cinema_crud
-from schemas.cinema_room import CinemaRoom, CinemaRoomCreate, CinemaRoomResponse, User
+from schemas.cinema_room import CinemaRoom, CinemaRoomCreate, User
 
 
 router = APIRouter()
@@ -11,7 +11,7 @@ router = APIRouter()
 
 @router.get(
     "/{cinema_room_id}",
-    response_model=CinemaRoomResponse,
+    response_model=CinemaRoom,
     summary="Get cinema room by id",
     description="Route return all data about room including admin, film, users in room and film_timestamp",
 )
@@ -26,7 +26,7 @@ async def cinema_room_details(
 
 @router.post(
     "/create",
-    response_model=CinemaRoomResponse,
+    response_model=CinemaRoom,
     summary="Create cinema room",
     description="Route for create cinema room with admin_id, film_id, user_ids and film_timestamp",
 )

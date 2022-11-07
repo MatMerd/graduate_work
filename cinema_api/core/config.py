@@ -1,5 +1,4 @@
 from functools import lru_cache
-from typing import TypeVar, Any
 
 from .settings.base import AppEnvTypes
 from .settings.app_settings import AppSettings
@@ -10,7 +9,7 @@ from .settings.production_app import ProdAppSettings
 app_type = {AppEnvTypes.dev: DevAppSettings, AppEnvTypes.prod: ProdAppSettings}
 
 
-settings: AppSettings
+app_settings: AppSettings
 
 
 @lru_cache

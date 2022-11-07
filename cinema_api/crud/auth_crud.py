@@ -20,22 +20,18 @@ async def get_json(session: aiohttp.ClientSession, url: str) -> dict[str, Any]:
 async def get_current_user_http(
     authorization: HTTPAuthorizationCredentials = Depends(HTTPBearer()),
 ) -> User:
-    async with aiohttp.ClientSession(
-        headers={"Authorization": authorization.credentials}
-    ) as session:
+    async with aiohttp.ClientSession(headers={"Authorization": authorization.credentials}) as session:
         json_data = await get_json(
             session=session,
-            url=f"{config.settings.auth_service_url}/users/identify-user",
+            url=f"{config.app_settings.auth_service_url}/users/identify-user",
         )
         return User(user_id=json_data["user_id"], username=json_data["login"])
 
 
 async def get_current_user_ws(authorization: str = Header(...)) -> User:
-    async with aiohttp.ClientSession(
-        headers={"Authorization": authorization}
-    ) as session:
+    async with aiohttp.ClientSession(headers={"Authorization": authorization}) as session:
         json_data = await get_json(
             session=session,
-            url=f"{config.settings.auth_service_url}/users/identify-user",
+            url=f"{config.app_settings.auth_service_url}/users/identify-user",
         )
         return User(user_id=json_data["user_id"], username=json_data["login"])

@@ -1,4 +1,3 @@
-import logging
 from typing import Any
 import uvicorn
 
@@ -7,11 +6,11 @@ from fastapi import FastAPI, Request
 from fastapi.responses import ORJSONResponse
 from starlette.middleware.cors import CORSMiddleware
 
-from api.v1 import cinema_room, cinema_room_ws
 from core.exceptions import (
     CinemaRoomNotFoundError,
     UserNotAuthentificated,
     UserPermissionError,
+    UserNotFoundError
 )
 from db import redis
 import core.log as log
@@ -32,7 +31,7 @@ def setup_app(env_type: AppEnvTypes | None = None):
     else:
         api_settings = config.get_app_settings()
 
-    config.settings = api_settings
+    config.app_settings = api_settings
 
     log.main_logger = api_settings.setup_logger("main_logger")
     setup_app_middleware(api_settings.middleware)
@@ -53,9 +52,7 @@ def setup_app(env_type: AppEnvTypes | None = None):
         await redis._redis_client.close()
 
     @app.exception_handler(CinemaRoomNotFoundError)
-    async def cinema_not_found_exception_handler(
-        request: Request, exc: CinemaRoomNotFoundError
-    ):
+    async def cinema_not_found_exception_handler(request: Request, exc: CinemaRoomNotFoundError):
         return ORJSONResponse(status_code=exc.status_code, content=exc.json_error())
 
     @app.exception_handler(UserNotAuthentificated)
@@ -66,6 +63,10 @@ def setup_app(env_type: AppEnvTypes | None = None):
     async def user_not_have_permission(request: Request, exc: CinemaRoomNotFoundError):
         return ORJSONResponse(status_code=exc.status_code, content=exc.json_error())
 
+    @app.exception_handler(UserNotFoundError)
+    async def user_not_found_error(request: Request, exc: UserNotFoundError):
+        return ORJSONResponse(status_code=exc.status_code, content=exc.json_error())
+
 
 def setup_app_middleware(middleware_settings: dict[str, Any]):
     log.main_logger.info("Setup middlewares")
@@ -73,10 +74,9 @@ def setup_app_middleware(middleware_settings: dict[str, Any]):
 
 
 def setup_routers(api_prefix: str):
+    from api.v1 import cinema_room, cinema_room_ws
     app.include_router(router=cinema_room.router, prefix=f"{api_prefix}/cinema-room")
-    app.include_router(
-        router=cinema_room_ws.router, prefix=f"{api_prefix}/cinema-room/ws"
-    )
+    app.include_router(router=cinema_room_ws.router, prefix=f"{api_prefix}/cinema-room/ws")
 
 
 if __name__ == "__main__":

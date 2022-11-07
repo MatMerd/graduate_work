@@ -74,6 +74,30 @@ class CinemaCRUD:
             cinema_room=cinema_room, update_room_data=update_cinema_room
         )
 
+    async def pause_film(
+        self, *, cinema_room: CinemaRoom
+    ) -> CinemaRoom:
+        update_cinema_room = CinemaRoomUpdate(is_film_pause=True)
+        return await self.cinema_service.update_cinema_room(
+            cinema_room=cinema_room, update_room_data=update_cinema_room
+        )
+    
+    async def stop_film(
+        self, *, cinema_room: CinemaRoom
+    ) -> CinemaRoom:
+        update_cinema_room = CinemaRoomUpdate(is_film_stoped=True)
+        return await self.cinema_service.update_cinema_room(
+            cinema_room=cinema_room, update_room_data=update_cinema_room
+        )
+    
+    async def play_film(
+        self, *, cinema_room: CinemaRoom
+    ) -> CinemaRoom:
+        update_cinema_room = CinemaRoomUpdate(is_film_pause=False, is_film_stoped=False)
+        return await self.cinema_service.update_cinema_room(
+            cinema_room=cinema_room, update_room_data=update_cinema_room
+        )
+
     async def get_cinema_room(self, *, cinema_room_key: str) -> CinemaRoom:
         cinema_room = await self.cinema_service.get_cinema_room(cinema_room_key)
         return cinema_room
