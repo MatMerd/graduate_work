@@ -15,9 +15,7 @@ async def pause_video(manager: WebsocketManager, command: dict[str, Any]):
 
 async def stop_video(manager: WebsocketManager, command: dict[str, Any]):
     parsed_command = Command(**command)
-    ws = [
-        ws for ws, u in manager.users.items() if u.username == parsed_command.username
-    ][0]
+    ws = [ws for ws, u in manager.users.items() if u.username == parsed_command.username][0]
     user = manager.users[ws]
     if user.cinema_room_user_type is CinemaRoomUserTypeEnum.admin:
         manager.cinema_room = await manager.cinema_crud.stop_film(cinema_room=manager.cinema_room)
@@ -41,11 +39,13 @@ async def play_video(manager: WebsocketManager, command: dict[str, Any]):
 
 async def forward_video(manager: WebsocketManager, command: dict[str, Any]):
     parsed_command = Command(**command)
-    ws = [
-        ws for ws, u in manager.users.items() if u.username == parsed_command.username
-    ][0]
+    ws = [ws for ws, u in manager.users.items() if u.username == parsed_command.username][0]
     user = manager.users[ws]
     if user.cinema_room_user_type is CinemaRoomUserTypeEnum.admin:
+        timestamp = manager.cinema_room.film_view_timestamp
+        manager.cinema_room = await manager.cinema_crud.update_film_timestamp(
+            cinema_room=manager.cinema_room, film_timestamp=timestamp + 10
+        )
         await manager.broadcast(command)
     else:
         await manager.send_personal_message(
@@ -60,11 +60,13 @@ async def forward_video(manager: WebsocketManager, command: dict[str, Any]):
 
 async def rewind_video(manager: WebsocketManager, command: dict[str, Any]):
     parsed_command = Command(**command)
-    ws = [
-        ws for ws, u in manager.users.items() if u.username == parsed_command.username
-    ][0]
+    ws = [ws for ws, u in manager.users.items() if u.username == parsed_command.username][0]
     user = manager.users[ws]
     if user.cinema_room_user_type is CinemaRoomUserTypeEnum.admin:
+        timestamp = manager.cinema_room.film_view_timestamp
+        manager.cinema_room = await manager.cinema_crud.update_film_timestamp(
+            cinema_room=manager.cinema_room, film_timestamp=timestamp - 10
+        )
         await manager.broadcast(command)
     else:
         await manager.send_personal_message(
@@ -78,17 +80,13 @@ async def rewind_video(manager: WebsocketManager, command: dict[str, Any]):
 
 
 async def send_message(manager: WebsocketManager, command: dict[str, Any]):
-    await manager.message_service.add_message_to_room(
-        manager.cinema_room_chanel, command
-    )
+    await manager.message_service.add_message_to_room(manager.cinema_room_chanel, command)
     await manager.broadcast(command)
 
 
 async def exclude_user(manager: WebsocketManager, command: dict[str, Any]):
     parsed_command = Command(**command)
-    ws = [
-        ws for ws, u in manager.users.items() if u.username == parsed_command.username
-    ][0]
+    ws = [ws for ws, u in manager.users.items() if u.username == parsed_command.username][0]
     user = manager.users[ws]
     if user.cinema_room_user_type is CinemaRoomUserTypeEnum.admin:
         await manager.disconnect(ws, user)
@@ -100,7 +98,7 @@ async def exclude_user(manager: WebsocketManager, command: dict[str, Any]):
                 message="Only admin can disconnect another user",
             ),
             ws,
-        )   
+        )
 
 
 handlers_mapping = {

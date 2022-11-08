@@ -1,5 +1,4 @@
 import { sortUsers } from "../../utils/helpers";
-import { decodeMessages } from "../../utils/crypt";
 import {
   MessageType,
   UserType,
@@ -33,13 +32,13 @@ const response: Response = {
 
 const wsHandler = {
   200: (r: defaultWsRequest): Result => {
-    const encMessage: MessageType = {
+    const Message: MessageType = {
       Message: r.message,
       Created_at: r.time,
       Username: r.username,
       current: false,
     };
-    response.message = decodeMessages(Array(encMessage))[0];
+    response.message = Array(Message)[0];
     return { typeWs: "message", response: response };
   },
 

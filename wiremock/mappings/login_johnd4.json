@@ -1,0 +1,26 @@
+{
+    "name" : "Login mock",
+    "request" : {
+        "url" : "/api/v1/login",
+        "method" : "POST",
+        "bodyPatterns" : [ {
+        "equalToJson" : {
+            "login" : "johnd4",
+            "password" : "123456789"
+        },
+        "ignoreArrayOrder" : true,
+        "ignoreExtraElements" : true
+        } ]
+    },
+    "response" : {
+        "status" : 200,
+        "jsonBody" : {
+        "message" : "success"
+        },
+        "headers" : {
+            "Content-Type" : "application/json; charset=UTF-8",
+            "Access-Control-Expose-Headers": "*, Authorization",
+            "Authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbiI6ImpvaG5kNCIsInVzZXJfaWQiOiJhZDlkN2I4My02NjAxLTQwNmQtOTBiZi04YmQ1NDgzY2QxYTgifQ.HDlJy2j-5L4viSpdAJzJFBh8MGGl6BHIw_SdeH1sk3E"
+        }
+    }
+}

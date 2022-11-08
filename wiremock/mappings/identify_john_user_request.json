@@ -23,7 +23,8 @@
             "user_id" : "ad9d7b83-6601-406d-90bf-8bd5483cd1a8"
         },
         "headers" : {
-            "Content-Type" : "application/json; charset=UTF-8"
+            "Content-Type" : "application/json; charset=UTF-8",
+            "Access-Control-Allow-Origin": "*"
         }
     }
 }

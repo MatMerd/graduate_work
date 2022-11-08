@@ -20,7 +20,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - 8000:3000
+      - 5000:3000
     restart: always
   
   wiremock:
@@ -33,5 +33,6 @@ services:
       - "--max-request-journal-entries=1000"
       - "--container-threads=120"
       - "--extensions=com.github.masonm.JwtMatcherExtension,com.github.masonm.JwtStubMappingTransformer"
+      - "--enable-stub-cors"
     ports:
       - 8080:8080

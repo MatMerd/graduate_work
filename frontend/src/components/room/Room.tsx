@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { getCookie } from "../../utils/helpers";
 import { RequestOtions } from "../../utils/reuests";
-import { decodeMessages, encodeMessage } from "../../utils/crypt";
 import { UserType, MessageType, Session } from "./roomTypes";
 import RoomUsers from "./users/RoomUsers";
 import "../../style/Room.css";
@@ -54,7 +53,7 @@ const Room: React.FC = () => {
     },
     message: (data: Response, messagesGet?: Array<MessageType>) => {
       // @ts-ignore
-      messagesGet?.push(data.message);
+      messagesGet.push(data.message);
       setMessages([...(messagesGet || [])]);
     },
     void: (data: Response, messagesGet?: Array<MessageType>) => {
@@ -115,7 +114,7 @@ const Room: React.FC = () => {
         localStorage.setItem("x-token", response.headers["x-token"] || "");
         setName(response.data.User);
         try {
-          const messagesGet = decodeMessages(response.data.Messages);
+          const messagesGet = response.data.Messages;
           setMessages(messagesGet);
           wsManager(response.data.Users, messagesGet);
         } catch (error) {
@@ -222,7 +221,7 @@ const Room: React.FC = () => {
       SendMessage(wsMsg, {
         status: 200,
         username: username,
-        message: encodeMessage(inValue) || "",
+        message: inValue || "",
       });
       // @ts-ignore
       inputEl.current.value = "";
